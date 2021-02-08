@@ -13,14 +13,20 @@
 enum jetson_version {TK1, TX1, TX2};
 
 struct tegrastats {
-  int mem_usage;
-  int mem_max;
+  int mem_usage = 0;
+  int mem_max = 0;
 
   std::vector<int> cpu_usage;
   std::vector<int> cpu_freq;
 
-  int gpu_usage;
-  int gpu_freq;
+  int gpu_usage = 0;
+  int gpu_freq = 0;
+
+  int emc_usage = 0;
+  int emc_freq;
+
+  float gpu_temp = 0;
+  float cpu_temp = 0;
 
   jetson_version version;
 };

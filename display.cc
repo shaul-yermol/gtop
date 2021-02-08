@@ -129,6 +129,16 @@ void display_gpu_stats(const int & row, const tegrastats & ts) {
 void display_mem_stats(const int & row, const tegrastats & ts) {
   mvprintw(row, 0, "Mem");
   display_mem_bars(row, BAR_OFFSET, ts.mem_usage, ts.mem_max);
+  mvprintw(row+1, 0, "EMC");
+  display_bars(row+1, BAR_OFFSET, ts.emc_usage, ts.emc_freq);  
+}
+
+// Temperature
+void display_temp_stats(const int & row, const tegrastats & ts) {
+  mvprintw(row, 0, "GPU  Celsius");
+  display_bars(row, BAR_OFFSET, ts.gpu_temp, 100);
+  mvprintw(row+1, 0, "CPU Celsius");
+  display_bars(row+1, BAR_OFFSET, ts.cpu_temp, 100);
 }
 
 void display_usage_chart(const int & row, const std::vector<std::vector<int>> cpu_usage_buffer) {

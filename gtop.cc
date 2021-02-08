@@ -51,7 +51,7 @@ int main() {
 
     // CPU USAGE CHART
     update_usage_chart(cpu_usage_buffer, t_stats.cpu_usage);
-    display_usage_chart(10, cpu_usage_buffer);
+    display_usage_chart(13, cpu_usage_buffer);
 
 
     lk.unlock();
@@ -116,7 +116,7 @@ tegrastats parse_tegrastats(const char * buffer) {
   tegrastats ts;
   auto stats = tokenize(buffer, ' ');
 
-  if (stats.size() >= 15)
+  if (stats.size() == 15)
     ts.version = TX1;
   else
     ts.version = TX2;
@@ -126,17 +126,47 @@ tegrastats parse_tegrastats(const char * buffer) {
   switch (ts.version) {
     case TX1:
       get_cpu_stats_tx1(ts, stats.at(5));
-      get_gpu_stats(ts, stats.at(15));
       break;
     case TX2:
       get_cpu_stats_tx2(ts, stats.at(5));
-      get_gpu_stats(ts, stats.at(13));
       break;
     case TK1: // TODO
       break;
   }
 
+  for (unsigned int i = 0; i < stats.size(); i++) {
+    if ((stats.at(i)).substr(0,3).compare("EMC") == 0) {
+      get_emc_stats(ts, stats.at(i+1));
+    }
+    if ((stats.at(i)).substr(0,4).compare("GR3D") == 0) {
+      get_gpu_stats(ts, stats.at(i+1));
+    }
+    if ((stats.at(i)).substr(0,4).compare("GPU@") == 0) {
+      get_gpu_temp_stats(ts, stats.at(i));
+    }
+    if ((stats.at(i)).substr(0,5).compare("MCPU@") == 0) {
+      get_cpu_temp_stats(ts, stats.at(i));
+    }
+  }
+
+
   return ts;
+}
+
+void get_emc_stats(tegrastats & ts, const std::string & str) {
+  const auto emc_stats = tokenize(str, '@');
+  const auto emc_usage = emc_stats.at(0);
+
+  ts.emc_usage = std::stoi(emc_usage.substr(0, emc_usage.size()-1));
+  ts.emc_freq = std::stoi(emc_stats.at(1));
+}
+
+void get_gpu_temp_stats(tegrastats & ts, const std::string & str) {
+  sscanf(str.c_str(), "GPU@%fC", &ts.gpu_temp);
+}
+
+void get_cpu_temp_stats(tegrastats & ts, const std::string & str) {
+  sscanf(str.c_str(), "MCPU@%fC", &ts.cpu_temp);
 }
 
 void get_cpu_stats_tx1(tegrastats & ts, const std::string & str) {
@@ -198,6 +228,9 @@ void display_stats(const dimensions & d, const tegrastats & ts) {
 
   // Memory
   display_mem_stats(ts.cpu_usage.size()+1, ts);
+
+  // Temperature
+  display_temp_stats(ts.cpu_usage.size()+3, ts);
 }
 
 void update_usage_chart(std::vector<std::vector<int>> & usage_buffer,

@@ -11,7 +11,7 @@
 
 #include "utils.hh"
 
-const int BAR_OFFSET = 6;
+const int BAR_OFFSET = 12;
 const int MIN_HEIGHT_USAGE_CHART = 30;
 
 enum colors {RED_BLACK=1,
@@ -70,5 +70,6 @@ void display_cpu_stats(const int &, const tegrastats &);
 void display_gpu_stats(const int &, const tegrastats &);
 void display_mem_stats(const int &, const tegrastats &);
 void display_usage_chart(const int &, const std::vector<std::vector<int>>);
+void display_temp_stats(const int & row, const tegrastats & ts);
 
 #endif // DISPLAY_HH_
